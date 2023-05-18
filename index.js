@@ -34,10 +34,24 @@ async function run() {
     });
     // Get single toy
     app.get("/toys/:id", async (req, res) => {
-      const singleToyId = req.params.id;
-      const query = { _id: new ObjectId(singleToyId) };
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
       const result = await toyCollection.findOne(query);
       res.send(result);
+    });
+    // post a toy
+    app.post("/post-toy", async (req, res) => {
+      const body = req.body;
+      console.log(body);
+      const result = await toyCollection.insertOne(body);
+      if (result?.insertedId) {
+        return res.status(200).send(result);
+      } else {
+        return res.status(404).send({
+          message: "can not insert try again later",
+          status: false,
+        });
+      }
     });
 
     // Send a ping to confirm a successful connection
