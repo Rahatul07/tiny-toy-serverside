@@ -17,12 +17,20 @@ const client = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 10,
 });
 
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    await client.connect((err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    });
 
     // Set collection
     const toyCollection = client.db("toyDB").collection("toys");
@@ -40,7 +48,7 @@ async function run() {
       res.send(result);
     });
     // post a toy
-    app.post("/post-toy", async (req, res) => {
+    app.post("/toys", async (req, res) => {
       const body = req.body;
       console.log(body);
       const result = await toyCollection.insertOne(body);
@@ -68,6 +76,13 @@ async function run() {
         },
       };
       const result = await toyCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    // Delete a toy
+    app.delete("/toys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await toyCollection.deleteOne(query);
       res.send(result);
     });
 
