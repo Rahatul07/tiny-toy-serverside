@@ -36,13 +36,13 @@ async function run() {
     const toyCollection = client.db("toyDB").collection("toys");
 
     // Get All toys
-    app.get("/toys", async (req, res) => {
-      const result = await toyCollection
-        .find()
-        .sort({ createdAt: -1 })
-        .toArray();
-      res.send(result);
-    });
+    // app.get("/toys", async (req, res) => {
+    //   const result = await toyCollection
+    //     .find()
+    //     .sort({ createdAt: -1 })
+    //     .toArray();
+    //   res.send(result);
+    // });
     // Get single toy
     app.get("/toys/:id", async (req, res) => {
       const id = req.params.id;
@@ -51,15 +51,34 @@ async function run() {
       res.send(result);
     });
     // Get toys by email
-    app.get("/toys/:email", async (req, res) => {
-      const toys = await toyCollection
-        .find({
-          email: req.params.email,
-        })
-        .toArray();
-      res.send(toys);
-    });
+    // app.get("/toys/:email", async (req, res) => {
+    //   console.log(req.params.id);
+    //   const toys = await toyCollection
+    //     .find({
+    //       sellerEmail: req.params.email,
+    //     })
+    //     .toArray();
+    //   res.send(toys);
+    // });
     // post a toy
+
+    app.get("/toys", async (req, res) => {
+      let query = {};
+      if (req.query?.category) {
+        query = { category: req.query.category };
+      }
+      if (req.query?.email) {
+        query = { sellerEmail: req.query.email };
+      }
+      const result = await toyCollection
+        .find(query)
+        .sort({ createdAt: -1 })
+        .limit(20)
+        .toArray();
+
+      res.send(result);
+    });
+
     app.post("/toys", async (req, res) => {
       const body = req.body;
       body.createdAt = new Date();
