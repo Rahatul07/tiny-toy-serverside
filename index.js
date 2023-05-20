@@ -62,6 +62,7 @@ async function run() {
     // });
     // post a toy
 
+    // Get all toys
     app.get("/toys", async (req, res) => {
       let query = {};
       if (req.query?.category) {
@@ -79,6 +80,18 @@ async function run() {
       res.send(result);
     });
 
+    // Get toys by category
+    app.get("/allToysByCategory/:category", async (req, res) => {
+      console.log(req.params.id);
+      const toys = await toyCollection
+        .find({
+          status: req.params.category,
+        })
+        .toArray();
+      res.send(toys);
+    });
+
+    // Post(create) a toy
     app.post("/toys", async (req, res) => {
       const body = req.body;
       body.createdAt = new Date();
